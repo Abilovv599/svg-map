@@ -1,0 +1,108 @@
+.uuid-4c86560d-245b-4c4a-ba45-033555cdd628 {
+  fill: #bca5cb;
+}
+
+.uuid-61cb6c3f-7e5b-48d6-b3c7-2d7a921a939e,
+.uuid-64436c6e-c22d-4474-89a5-b2ba8f7b5ef4 {
+  fill: #abd7d1;
+}
+
+.uuid-b9f30c39-e340-428a-a5ac-62d04b6e86e1,
+.uuid-ebd61c9f-29ca-45e7-a7a9-97caf52408d2 {
+  fill: #221f20;
+}
+
+.uuid-4cc2b6e6-9f4d-4717-965c-2e571a57fdf1 {
+  stroke: #d93c34;
+  stroke-dasharray: 0 9;
+  stroke-width: 3px;
+}
+
+.uuid-4cc2b6e6-9f4d-4717-965c-2e571a57fdf1,
+.uuid-598ddbd6-0183-437e-ac22-dde823271dc7,
+.uuid-9685c645-c1d1-4636-97ed-fca0c9d1154f,
+.uuid-64436c6e-c22d-4474-89a5-b2ba8f7b5ef4,
+.uuid-fcca99bd-c562-4c96-96bd-274d0ad087a3,
+.uuid-c85bfbef-a6cd-4714-8ab9-f44f88d41afb,
+.uuid-82111a6a-a6f9-4934-a5dd-ad9df529f61e,
+.uuid-161b767a-859e-4658-b522-7e60d3fc6c45,
+.uuid-cbd0abd2-6f4d-4efe-bb53-eeef056c80a7,
+.uuid-92f11b67-df35-47a8-ab65-25caa90d8630,
+.uuid-e5aa1c74-00f4-4c6d-bd28-945856c6e38f {
+  stroke-miterlimit: 10;
+}
+
+.uuid-4cc2b6e6-9f4d-4717-965c-2e571a57fdf1,
+.uuid-92f11b67-df35-47a8-ab65-25caa90d8630,
+.uuid-e5aa1c74-00f4-4c6d-bd28-945856c6e38f {
+  fill: none;
+}
+
+.uuid-598ddbd6-0183-437e-ac22-dde823271dc7 {
+  fill: #e4e890;
+}
+
+.uuid-598ddbd6-0183-437e-ac22-dde823271dc7,
+.uuid-9685c645-c1d1-4636-97ed-fca0c9d1154f,
+.uuid-64436c6e-c22d-4474-89a5-b2ba8f7b5ef4,
+.uuid-fcca99bd-c562-4c96-96bd-274d0ad087a3,
+.uuid-c85bfbef-a6cd-4714-8ab9-f44f88d41afb,
+.uuid-82111a6a-a6f9-4934-a5dd-ad9df529f61e,
+.uuid-161b767a-859e-4658-b522-7e60d3fc6c45,
+.uuid-e5aa1c74-00f4-4c6d-bd28-945856c6e38f {
+  stroke-width: 0.25px;
+}
+
+.uuid-598ddbd6-0183-437e-ac22-dde823271dc7,
+.uuid-9685c645-c1d1-4636-97ed-fca0c9d1154f,
+.uuid-e5aa1c74-00f4-4c6d-bd28-945856c6e38f {
+  stroke: #000;
+}
+
+.uuid-9685c645-c1d1-4636-97ed-fca0c9d1154f {
+  fill: #e7e9cc;
+}
+
+.uuid-64436c6e-c22d-4474-89a5-b2ba8f7b5ef4,
+.uuid-82111a6a-a6f9-4934-a5dd-ad9df529f61e {
+  stroke: #a9a8a9;
+}
+
+.uuid-fcca99bd-c562-4c96-96bd-274d0ad087a3 {
+  fill: #dab4cd;
+  stroke: #b6b6b7;
+}
+
+.uuid-c85bfbef-a6cd-4714-8ab9-f44f88d41afb {
+  fill: #c7dfb2;
+  stroke: #a5a4a4;
+}
+
+.uuid-82111a6a-a6f9-4934-a5dd-ad9df529f61e {
+  fill: #c7dfb3;
+}
+
+.uuid-161b767a-859e-4658-b522-7e60d3fc6c45 {
+  fill: #bba5cb;
+  stroke: #c9c9c9;
+}
+
+.uuid-cbd0abd2-6f4d-4efe-bb53-eeef056c80a7 {
+  fill: #dcdcdc;
+  stroke: #dcdcdc;
+}
+
+.uuid-92f11b67-df35-47a8-ab65-25caa90d8630 {
+  stroke: #221f20;
+  stroke-width: 2px;
+}
+
+.uuid-ebd61c9f-29ca-45e7-a7a9-97caf52408d2 {
+  font-family: Neology, Neology;
+  font-size: 12.03px;
+}
+
+/* Highlight elements with data-selected="true" */
+svg *[data-selected="true"] {
+  fill: red;
+}
