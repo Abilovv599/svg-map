@@ -39,7 +39,7 @@ export const MapWithoutTextSvg: FC<SvgProps> = ({
         width="1779"
         height="1047"
         transform="scale(.67)"
-        xlinkHref="map-bg.jpg"
+        xlinkHref="assets/map-bg.jpg"
       />
       <g>
         <path
