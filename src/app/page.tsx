@@ -8,7 +8,7 @@ export default function Home() {
           Interactive SVG Map
         </h1>
         <div className="bg-white p-6 rounded-xl shadow-lg">
-          <Map width={800} height={600} initialZoom={1} />
+          <Map />
         </div>
       </div>
     </div>

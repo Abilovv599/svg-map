@@ -33,11 +33,11 @@ export const Map: FC<MapProps> = ({
     const id = target.getAttribute("id");
     const className = target.getAttribute("class");
 
-    handleElementClick(id, className);
+    handleElementClick(className, id);
   };
 
-  const handleElementClick = (id: string | null, className: string | null) => {
-    const identifier = id || className;
+  const handleElementClick = (className: string | null, id: string | null) => {
+    const identifier = className || id;
     if (!identifier) return;
 
     setSelectedElements((prev) => {
@@ -118,6 +118,7 @@ export const Map: FC<MapProps> = ({
         viewBox={`0 0 ${width} ${height}`}
         className="border border-gray-200 rounded-lg bg-white"
         transform={`translate(${position.x}, ${position.y}) scale(${zoom})`}
+        style={{ cursor: isDragging ? "grabbing" : "default" }}
         onClick={handleClick}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
