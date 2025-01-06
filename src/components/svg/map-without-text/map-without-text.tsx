@@ -1,38 +1,11 @@
-import React from "react";
 import type { SVGProps, FC } from "react";
 import "./map-without-text.css";
 
-interface SvgProps extends SVGProps<SVGSVGElement> {
-  onElementClick?: (id: string | null, className: string | null) => void;
-}
-
-export const MapWithoutTextSvg: FC<SvgProps> = ({
-  onElementClick,
-  ...props
-}) => {
-  const handleClick = (event: React.MouseEvent<SVGElement>) => {
-    const target = event.target as SVGElement;
-
-    // Toggle data-selected attribute
-    const isSelected = target.getAttribute("data-selected") === "true";
-    target.setAttribute("data-selected", isSelected ? "false" : "true");
-
-    // Pass the element's id and className to the parent
-    const id = target.getAttribute("id");
-    const className = target.getAttribute("class");
-    if (onElementClick) {
-      onElementClick(id, className);
-    }
-  };
-
+export const MapWithoutTextSvg: FC<SVGProps<SVGSVGElement>> = (props) => {
   return (
     <svg
-      id="uuid-1145c838-cd15-4351-a1d6-b34703b5c6a6"
-      data-name="Layer 1"
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
-      viewBox="0 0 1193.67 702.51"
-      onClick={handleClick} // Event delegation
       {...props}
     >
       <image
