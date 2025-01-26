@@ -1,25 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://web.resource.org/cc/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="1243.0814"
-   height="673.09143"
-   viewBox="0 0 15000 7095.65"
-   id="svg2"
-   sodipodi:version="0.32"
-   inkscape:version="0.45"
-   version="1.0"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape"
-   sodipodi:modified="true">
-  <defs
-     id="defs4" >
-         <style>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1"   width="1243.0814"
+   height="673.09143" viewBox="0 0 15000 7095.65">
+  <!-- Generator: Adobe Illustrator 29.1.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 142)  -->
+  <defs>
+    <style>
       .st0 {
         fill: #757575;
       }
@@ -111,34 +94,7 @@
         fill: #d885ff;
       }
     </style>
-     </defs>
-  <sodipodi:namedview
-     id="base"
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1.0"
-     inkscape:pageopacity="0.0"
-     inkscape:pageshadow="2"
-     inkscape:zoom="2.8"
-     inkscape:cx="332.9999"
-     inkscape:cy="185.37797"
-     inkscape:document-units="px"
-     inkscape:current-layer="layer1"
-     inkscape:window-width="1024"
-     inkscape:window-height="712"
-     inkscape:window-x="-4"
-     inkscape:window-y="-4" />
-  <metadata
-     id="metadata7">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
+  </defs>
   <g>
     <path class="st10" d="M8480.13,6186.37l-4.94-4.82,122.27-125.31,50.15-62.33,56.62-108.64,40.6-48.42.85-.32c40.92-15.27,104.1-40.29,110.46-46.64,1.01-1.01,3.25-3.29,6.49-6.58,78.09-79.39,130.56-129.76,155.95-149.71l.67-.52.84-.15c81.79-15.17,122.23-19.89,122.62-19.93l84.98-6.07,56.83-35.34,1.14.09c.18.02,18.63,1.51,54.66,0,35.42-1.46,55.78-8.26,94.75-31.62l.67-.4.77-.08c46.77-4.54,79.06-9.14,79.38-9.18l.87-.12,86.02,32.26,73.48,4.51,65.39-33.48.5-.09,83.66-15.21,126.77-62.59,224.15-90.72,35.83-20.81,3.46,5.97-36.48,21.15-224.26,90.76-127.29,62.86-.48.09-83.64,15.21-66.17,33.87-76.4-4.69-.48-.18-84.86-31.82c-5.46.76-35.79,4.91-78.04,9.02-39.25,23.47-61.19,30.7-97.34,32.2-31.83,1.33-49.78.38-54.36.07l-56.36,35.05-86.53,6.18c-.25.03-40.21,4.7-121.17,19.69-25.41,20.13-77.43,70.11-154.63,148.6-3.26,3.32-5.51,5.61-6.53,6.62-9.24,9.22-98.16,42.7-112.07,47.9l-38.94,46.44-56.59,108.58-50.9,63.24-122.39,125.42Z"/>
     <path class="st10" d="M4868.87,1070.46c-50.9,0-117.71-21.95-162.26-42.2-50.78-23.08-39.63-66.99-38.64-70.5l38.93-192.35c.31-8.14,7.15-182.97,16.09-241.05,9.18-59.69,102.1-206.23,106.05-212.44.08-.12.16-.24.26-.35,1.01-1.21,101.37-122.39,151.14-206.08,49.62-83.46,79.62-208.88,79.92-210.14.44-1.85,2.3-3,4.15-2.56,1.85.44,3,2.3,2.56,4.15-.3,1.27-30.53,127.7-80.71,212.08-49.18,82.7-147.27,201.54-151.62,206.79-3.82,6.03-96.12,152.25-104.94,209.6-9.04,58.78-15.96,238.74-16.02,240.55,0,.19-.03.37-.07.55l-39.01,192.75c-.02.12-.06.24-.09.35-.51,1.66-12.12,41.01,34.85,62.37,47.96,21.8,121.96,45.61,172.65,41.01,46.31-4.21,110.36-68.73,142.12-111.07,26.99-35.98,305.57-460.51,311.86-470.1l75.65-142.13c.9-1.68,2.99-2.32,4.67-1.43,1.68.9,2.32,2.99,1.43,4.67l-75.72,142.27c-.05.09-.1.18-.16.27-2.84,4.34-284.91,434.2-312.2,470.58-27.96,37.28-94.67,109.05-147.01,113.8-4.46.41-9.1.6-13.87.6Z"/>
