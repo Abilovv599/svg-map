@@ -1,6 +1,6 @@
 "use client";
 
-import { ComponentPropsWithoutRef, useEffect } from "react";
+import { ComponentPropsWithoutRef, useEffect, useRef } from "react";
 import * as d3 from "d3";
 
 interface IInteractiveMapProps extends ComponentPropsWithoutRef<"div"> {
@@ -8,23 +8,23 @@ interface IInteractiveMapProps extends ComponentPropsWithoutRef<"div"> {
 }
 
 export function InteractiveMap({ imageSrc }: IInteractiveMapProps) {
-  useEffect(() => {
-    // -----------------------------------------------------------------------------
-    // 1) SELECT AND TYPECAST YOUR SVG ELEMENTS
-    // -----------------------------------------------------------------------------
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  const imageRef = useRef<SVGImageElement | null>(null);
 
-    const svg = d3.select<SVGSVGElement, unknown>("#map");
+  useEffect(() => {
+    if (!svgRef.current || !imageRef.current) return;
+
+    const svg = d3.select(svgRef.current);
     const imageSelection = svg.selectChild<SVGImageElement>("#image");
     const imageNode = imageSelection.node();
+
     if (!imageNode) {
       throw new Error("Cannot find #image node in the SVG structure.");
     }
+
     const { width, height } = imageNode.getBoundingClientRect();
 
-    // -----------------------------------------------------------------------------
-    // 2) SET UP THE ZOOM BEHAVIOR
-    // -----------------------------------------------------------------------------
-
+    // Set up zoom behavior
     const zoom = d3.zoom<SVGSVGElement, unknown>().on("zoom", zoomed);
 
     function updateExtents() {
@@ -49,39 +49,37 @@ export function InteractiveMap({ imageSrc }: IInteractiveMapProps) {
       zoom.scaleTo(svg, minScale);
     }
 
-    // -----------------------------------------------------------------------------
-    // 3) APPLY ZOOM, INITIALIZE VIEW, AND HANDLE RESIZING
-    // -----------------------------------------------------------------------------
-
+    // Apply zoom behavior
     svg.call(zoom);
     updateExtents();
 
     let resizeTimeout: NodeJS.Timeout;
-    window.addEventListener(
-      "resize",
-      () => {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(() => {
-          updateExtents();
-        }, 100);
-      },
-      { passive: true },
-    );
+    const handleResize = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        updateExtents();
+      }, 100);
+    };
+    window.addEventListener("resize", handleResize, { passive: true });
 
-    // -----------------------------------------------------------------------------
-    // 4) DEFINE THE ZOOM HANDLER
-    // -----------------------------------------------------------------------------
+    // Clean up event listener on unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [imageSrc]);
 
-    function zoomed(event: d3.D3ZoomEvent<SVGSVGElement, unknown>) {
-      const { transform } = event;
-      imageSelection.attr("transform", transform.toString());
+  function zoomed(event: d3.D3ZoomEvent<SVGSVGElement, unknown>) {
+    const { transform } = event;
+    if (imageRef.current) {
+      d3.select(imageRef.current).attr("transform", transform.toString());
     }
-  });
+  }
+
   return (
     <div style={{ width: "100%", height: "100%" }}>
-      <svg id="map" width="100%" height="100%">
+      <svg ref={svgRef} id="map" width="100%" height="100%">
         <g id="image">
-          <image href={imageSrc} />
+          <image ref={imageRef} href={imageSrc} />
         </g>
       </svg>
     </div>
