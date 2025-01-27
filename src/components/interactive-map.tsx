@@ -3,19 +3,17 @@
 import { ComponentPropsWithoutRef, useEffect, useRef } from "react";
 import * as d3 from "d3";
 
-interface IInteractiveMapProps extends ComponentPropsWithoutRef<"div"> {
-  imageSrc: string;
-}
+type IInteractiveMapProps = ComponentPropsWithoutRef<"div">;
 
-export function InteractiveMap({ imageSrc }: IInteractiveMapProps) {
+export function InteractiveMap({ children }: IInteractiveMapProps) {
   const svgRef = useRef<SVGSVGElement | null>(null);
-  const imageRef = useRef<SVGImageElement | null>(null);
+  const imageRef = useRef<SVGGElement | null>(null);
 
   useEffect(() => {
     if (!svgRef.current || !imageRef.current) return;
 
     const svg = d3.select(svgRef.current);
-    const imageSelection = svg.selectChild<SVGImageElement>("#image");
+    const imageSelection = svg.selectChild<SVGGElement>("#image");
     const imageNode = imageSelection.node();
 
     if (!imageNode) {
@@ -62,11 +60,17 @@ export function InteractiveMap({ imageSrc }: IInteractiveMapProps) {
     };
     window.addEventListener("resize", handleResize, { passive: true });
 
+    const innerSvg = imageSelection.select("#map-absheron_svg__Layer_1");
+
+    const clickableElements = innerSvg.selectChildren("[id]").nodes();
+
+    console.log(clickableElements);
+
     // Clean up event listener on unmount
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [imageSrc]);
+  }, []);
 
   function zoomed(event: d3.D3ZoomEvent<SVGSVGElement, unknown>) {
     const { transform } = event;
@@ -79,7 +83,7 @@ export function InteractiveMap({ imageSrc }: IInteractiveMapProps) {
     <div style={{ width: "100%", height: "100%" }}>
       <svg ref={svgRef} id="map" width="100%" height="100%">
         <g id="image">
-          <image ref={imageRef} href={imageSrc} />
+          <g ref={imageRef}>{children}</g>
         </g>
       </svg>
     </div>
