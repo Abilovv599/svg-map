@@ -2,15 +2,26 @@
 
 import { ComponentPropsWithoutRef, useEffect, useRef } from "react";
 import * as d3 from "d3";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 type IInteractiveMapProps = ComponentPropsWithoutRef<"div">;
 
 export function InteractiveMap({ children }: IInteractiveMapProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const svgRef = useRef<SVGSVGElement | null>(null);
   const imageRef = useRef<SVGGElement | null>(null);
   const zoomBehavior = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(
     null,
   );
+  const selectedIds = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    // Initialize selected IDs from URL
+    const initialSelected = searchParams.get("selected")?.split(",") || [];
+    selectedIds.current = new Set(initialSelected.filter(Boolean));
+  }, [searchParams]);
 
   useEffect(() => {
     if (!svgRef.current || !imageRef.current) return;
@@ -64,17 +75,55 @@ export function InteractiveMap({ children }: IInteractiveMapProps) {
     };
     window.addEventListener("resize", handleResize, { passive: true });
 
-    const innerSvg = imageSelection.select("#map-absheron_svg__Layer_1");
-
-    const clickableElements = innerSvg.selectChildren("[id]").nodes();
-
-    console.log(clickableElements);
-
     // Clean up event listener on unmount
     return () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+
+  useEffect(() => {
+    // Selection and click handler setup
+    const clickableElementsSelect = d3.selectAll<SVGElement, unknown>(
+      ":not(g):not(svg)[id*='absheron']",
+    );
+
+    // Apply initial selection from URL
+    clickableElementsSelect.each(function () {
+      const element = d3.select(this);
+      const id = this.id;
+      element.classed("selected", selectedIds.current.has(id));
+    });
+
+    // Click handler for selectable elements
+    clickableElementsSelect.on("click", function (event) {
+      event.stopPropagation(); // Prevent zoom behavior on element click
+      const element = d3.select(this);
+      const id = this.id;
+      const isSelected = element.classed("selected");
+
+      // Toggle selection state
+      element.classed("selected", !isSelected);
+
+      // Update selected IDs
+      if (!isSelected) {
+        selectedIds.current.add(id);
+      } else {
+        selectedIds.current.delete(id);
+      }
+
+      // Update URL with new selection
+      const params = new URLSearchParams(searchParams.toString());
+      const selectedString = Array.from(selectedIds.current).join(",");
+
+      if (selectedIds.current.size > 0) {
+        params.set("selected", selectedString);
+      } else {
+        params.delete("selected");
+      }
+
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    });
+  }, [pathname, router, searchParams]);
 
   function zoomed(event: d3.D3ZoomEvent<SVGSVGElement, unknown>) {
     const { transform } = event;

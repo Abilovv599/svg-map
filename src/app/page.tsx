@@ -1,5 +1,5 @@
 import { InteractiveMap } from "@/components/interactive-map";
-import Map from "../assets/map-absheron.svg";
+import Map from "../assets/map-absheron-v2.svg";
 
 export default function Home() {
   return (
