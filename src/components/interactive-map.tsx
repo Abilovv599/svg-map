@@ -84,7 +84,7 @@ export function InteractiveMap({ children }: IInteractiveMapProps) {
   useEffect(() => {
     // Selection and click handler setup
     const clickableElementsSelect = d3.selectAll<SVGElement, unknown>(
-      ":not(g):not(svg)[id*='absheron']",
+      "[id*='click']",
     );
 
     // Apply initial selection from URL
