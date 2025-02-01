@@ -7,11 +7,11 @@ body {
 }
 
 .selected {
-  fill: red !important;
-  stroke: red !important;
+  fill: #b3ecbd !important;
+  stroke: #b3ecbd !important;
 }
 
 /* If you have HTML elements mixed in */
 .selected {
-  background-color: red !important;
+  background-color: #b3ecbd !important;
 }
