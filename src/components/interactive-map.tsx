@@ -18,6 +18,8 @@ export function InteractiveMap({ children }: IInteractiveMapProps) {
   // Handle selectable elements
   const { selectedIds } = useSelectableElements();
 
+  console.debug(selectedIds);
+
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
       <ZoomControls onZoomIn={zoomIn} onZoomOut={zoomOut} />
