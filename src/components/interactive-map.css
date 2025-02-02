@@ -1,14 +1,16 @@
 .selected {
-    fill: #b3ecbd !important;
-    stroke: #b3ecbd !important;
+  fill: #b3ecbd !important;
+  stroke: #b3ecbd !important;
 }
 
-[id*='click'] {
-    cursor: pointer;
-    transition: fill 0.2s ease-in-out, stroke 0.2s ease-in-out;
+[id*="click"] {
+  cursor: pointer;
+  transition:
+    fill 0.2s ease-in-out,
+    stroke 0.2s ease-in-out;
 }
 
-[id*='click']:hover {
-    fill: #60a5fa;
-    stroke: #2563eb;
+[id*="click"]:hover {
+  fill: #60a5fa;
+  stroke: #2563eb;
 }
