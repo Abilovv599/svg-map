@@ -1,0 +1,9 @@
+.selected {
+    fill: #b3ecbd !important;
+    stroke: #b3ecbd !important;
+}
+
+/* If you have HTML elements mixed in */
+.selected {
+    background-color: #b3ecbd !important;
+}

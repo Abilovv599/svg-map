@@ -2,16 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  margin: 0;
+  padding: 0;
+}
+
 body {
   font-family: Arial, Helvetica, sans-serif;
-}
-
-.selected {
-  fill: #b3ecbd !important;
-  stroke: #b3ecbd !important;
-}
-
-/* If you have HTML elements mixed in */
-.selected {
-  background-color: #b3ecbd !important;
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import './interactive-map.css'
 import { ComponentPropsWithoutRef, useEffect, useRef } from "react";
 import * as d3 from "d3";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
