@@ -3,7 +3,12 @@
     stroke: #b3ecbd !important;
 }
 
-/* If you have HTML elements mixed in */
-.selected {
-    background-color: #b3ecbd !important;
+[id*='click'] {
+    cursor: pointer;
+    transition: fill 0.2s ease-in-out, stroke 0.2s ease-in-out;
+}
+
+[id*='click']:hover {
+    fill: #60a5fa;
+    stroke: #2563eb;
 }
