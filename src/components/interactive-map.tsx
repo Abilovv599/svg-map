@@ -64,7 +64,7 @@ export function InteractiveMap({ children }: IInteractiveMapProps) {
     }
 
     // Apply zoom behavior
-    svg.call(zoom);
+    svg.call(zoom).on("dblclick.zoom", null);
     updateExtents();
 
     let resizeTimeout: NodeJS.Timeout;
@@ -101,6 +101,11 @@ export function InteractiveMap({ children }: IInteractiveMapProps) {
       const element = d3.select(this);
       const id = this.id;
       const isSelected = element.classed("selected");
+
+      // Selected items at a time validation
+      if (selectedIds.current.size >= 30 && !isSelected) {
+        return alert("You can only select up to 30 items at a time.");
+      }
 
       // Toggle selection state
       element.classed("selected", !isSelected);
