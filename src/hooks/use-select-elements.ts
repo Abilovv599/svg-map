@@ -39,8 +39,8 @@ export function useSelectElements(
       const isSelected = element.classed("selected");
 
       // Selected items at a time validation
-      if (selectedIds.current.size >= 30 && !isSelected) {
-        return alert("You can only select up to 30 items at a time.");
+      if (selectedIds.current.size >= 100 && !isSelected) {
+        return alert("You can only select up to 100 items at a time.");
       }
 
       if (!svgRef?.current || !zoomBehavior?.current) return;
