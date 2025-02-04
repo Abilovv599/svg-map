@@ -34,8 +34,6 @@ export function useSvgZoom(
 
     const { width, height } = imageNode.getBoundingClientRect();
 
-    console.debug(width, height);
-
     function zoomed(event: d3.D3ZoomEvent<SVGSVGElement, unknown>) {
       const { transform } = event;
       if (imageRef.current) {

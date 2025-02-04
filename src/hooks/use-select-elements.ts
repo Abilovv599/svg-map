@@ -21,13 +21,13 @@ export function useSelectElements(
   useEffect(() => {
     // Selection and click handler setup
     const clickableElementsSelect = d3.selectAll<SVGElement, unknown>(
-      "[id*='click']",
+      "[id*='shop']",
     );
 
     // Apply initial selection from URL
     clickableElementsSelect.each(function () {
       const element = d3.select(this);
-      const id = this.id;
+      const id = this.id.replace('shop-', '');
       element.classed("selected", selectedIds.current.has(id));
     });
 
@@ -35,7 +35,7 @@ export function useSelectElements(
     clickableElementsSelect.on("click", function (event) {
       event.stopPropagation(); // Prevent zoom behavior on element click
       const element = d3.select(this);
-      const id = this.id;
+      const id = this.id.replace('shop-', '');
       const isSelected = element.classed("selected");
 
       // Selected items at a time validation
