@@ -27,7 +27,7 @@ export function useSelectElements(
     // Apply initial selection from URL
     clickableElementsSelect.each(function () {
       const element = d3.select(this);
-      const id = this.id.replace('shop-', '');
+      const id = this.id
       element.classed("selected", selectedIds.current.has(id));
     });
 
@@ -35,7 +35,7 @@ export function useSelectElements(
     clickableElementsSelect.on("click", function (event) {
       event.stopPropagation(); // Prevent zoom behavior on element click
       const element = d3.select(this);
-      const id = this.id.replace('shop-', '');
+      const id = this.id
       const isSelected = element.classed("selected");
 
       // Selected items at a time validation
