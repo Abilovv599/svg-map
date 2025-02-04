@@ -5,20 +5,25 @@ const nextConfig: NextConfig = {
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/,
-      use: ["@svgr/webpack"],
+      use: {
+        loader: "@svgr/webpack",
+        options: {
+          svgoConfig: {
+            plugins: [
+              {
+                name: "prefixIds",
+                params: {
+                  prefixIds: false,
+                  prefixClassNames: false
+                }
+              },
+            ],
+          },
+        },
+      },
     });
 
     return config;
-  },
-  experimental: {
-    turbo: {
-      rules: {
-        "*.svg": {
-          loaders: ["@svgr/webpack"],
-          as: "*.js",
-        },
-      },
-    },
   },
 };
 

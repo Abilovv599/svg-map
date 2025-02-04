@@ -1,21 +1,27 @@
 "use client";
 
 import "./interactive-map.css";
-import { ComponentPropsWithoutRef, useRef } from "react";
+import { useRef } from "react";
 import { useSelectElements } from "@/hooks/use-select-elements";
-import { ZoomControls } from "./map-controls";
+import { ZoomControls } from "../map-controls/map-controls";
 import { useSvgZoom } from "@/hooks/use-svg-zoom";
 
-type IInteractiveMapProps = ComponentPropsWithoutRef<"div">;
+import type { ComponentPropsWithoutRef } from "react";
+import type { ZoomBehavior } from "d3";
 
-export function InteractiveMap({ children }: IInteractiveMapProps) {
+type InteractiveMapProps = ComponentPropsWithoutRef<"div">;
+
+export function InteractiveMap({ children }: InteractiveMapProps) {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const imageRef = useRef<SVGGElement | null>(null);
+  const zoomBehavior = useRef<ZoomBehavior<SVGSVGElement, unknown> | null>(
+    null,
+  );
 
   // Initialize zoom functionality via custom hook
-  const { zoomIn, zoomOut } = useSvgZoom(svgRef, imageRef);
+  const { zoomIn, zoomOut } = useSvgZoom(svgRef, imageRef, zoomBehavior);
 
-  const {} = useSelectElements();
+  const {} = useSelectElements(svgRef, zoomBehavior);
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>

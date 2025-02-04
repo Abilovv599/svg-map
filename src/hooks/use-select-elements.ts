@@ -1,8 +1,11 @@
-import { useEffect, useRef } from "react";
+import { RefObject, useEffect, useRef } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import * as d3 from "d3";
 
-export function useSelectElements() {
+export function useSelectElements(
+  svgRef: RefObject<SVGSVGElement | null>,
+  zoomBehavior: RefObject<d3.ZoomBehavior<SVGSVGElement, unknown> | null>,
+) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -11,7 +14,7 @@ export function useSelectElements() {
 
   useEffect(() => {
     // Initialize selected IDs from URL
-    const initialSelected = searchParams.get("selected")?.split(",") || [];
+    const initialSelected = searchParams.get("ids")?.split(",") || [];
     selectedIds.current = new Set(initialSelected.filter(Boolean));
   }, [searchParams]);
 
@@ -40,6 +43,8 @@ export function useSelectElements() {
         return alert("You can only select up to 30 items at a time.");
       }
 
+      if (!svgRef?.current || !zoomBehavior?.current) return;
+
       // Toggle selection state
       element.classed("selected", !isSelected);
 
@@ -55,14 +60,14 @@ export function useSelectElements() {
       const selectedString = Array.from(selectedIds.current).join(",");
 
       if (selectedIds.current.size > 0) {
-        params.set("selected", selectedString);
+        params.set("ids", selectedString);
       } else {
-        params.delete("selected");
+        params.delete("ids");
       }
 
       router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     });
-  }, [pathname, router, searchParams]);
+  }, [pathname, router, searchParams, svgRef, zoomBehavior]);
 
   return { selectedIds };
 }

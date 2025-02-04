@@ -1,15 +1,12 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import type { RefObject } from "react";
 import * as d3 from "d3";
 
 export function useSvgZoom(
   svgRef: RefObject<SVGSVGElement | null>,
   imageRef: RefObject<SVGGElement | null>,
+  zoomBehavior: RefObject<d3.ZoomBehavior<SVGSVGElement, unknown> | null>,
 ) {
-  const zoomBehavior = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(
-    null,
-  );
-
   function zoomIn() {
     if (svgRef.current && zoomBehavior.current) {
       const svg = d3.select(svgRef.current);
@@ -25,7 +22,7 @@ export function useSvgZoom(
   }
 
   useEffect(() => {
-    if (!svgRef.current || !imageRef.current) return;
+    if (!svgRef.current || !imageRef.current || !zoomBehavior) return;
 
     const svg = d3.select(svgRef.current);
     const imageSelection = svg.selectChild<SVGGElement>("#image");
@@ -36,6 +33,8 @@ export function useSvgZoom(
     }
 
     const { width, height } = imageNode.getBoundingClientRect();
+
+    console.debug(width, height);
 
     function zoomed(event: d3.D3ZoomEvent<SVGSVGElement, unknown>) {
       const { transform } = event;
@@ -87,7 +86,7 @@ export function useSvgZoom(
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [imageRef, svgRef]);
+  }, [imageRef, svgRef, zoomBehavior]);
 
   return { zoomIn, zoomOut };
 }
