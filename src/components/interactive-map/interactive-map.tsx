@@ -18,10 +18,11 @@ export function InteractiveMap({ children }: InteractiveMapProps) {
     null,
   );
 
-  // Initialize zoom functionality via custom hook
-  const { zoomIn, zoomOut } = useSvgZoom(svgRef, imageRef, zoomBehavior);
+  // Initialize zoom functionality via custom hook and get the zoom functions from it.
+  const { zoomIn, zoomOut, zoomToPoint, resetZoom } = useSvgZoom(svgRef, imageRef, zoomBehavior);
 
-  const {} = useSelectElements(svgRef, zoomBehavior);
+  // Pass the zoom functions along with the zoomBehavior to the select hook.
+  useSelectElements(svgRef, zoomBehavior, { zoomToPoint, resetZoom });
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
