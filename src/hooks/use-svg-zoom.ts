@@ -7,6 +7,8 @@ export function useSvgZoom(
   imageRef: RefObject<SVGGElement | null>,
   zoomBehavior: RefObject<d3.ZoomBehavior<SVGSVGElement, unknown> | null>
 ) {
+  // Store image dimensions so they can be used for clamping
+  const imageDimensionsRef = useRef<{ width: number; height: number } | null>(null);
   // Store the minimum scale computed from the image dimensions.
   const minScaleRef = useRef<number>(1);
   // Store the initial transform so we can “reset” the zoom.
@@ -28,7 +30,8 @@ export function useSvgZoom(
 
   /**
    * Zooms to a point (x, y) in the SVG coordinate system.
-   * The view will transition so that (x, y) is centered at the given targetScale.
+   * This function first converts the pointer coordinates to the base coordinate system,
+   * then computes a new transform and clamps its translation so the map does not show empty borders.
    */
   function zoomToPoint(
     x: number,
@@ -37,26 +40,53 @@ export function useSvgZoom(
     duration: number = 300
   ) {
     if (!svgRef.current || !zoomBehavior.current) return;
+
     const svg = d3.select(svgRef.current);
     const { width: svgWidth, height: svgHeight } =
       svgRef.current.getBoundingClientRect();
 
-    // Get the current zoom transform from the SVG.
+    // Get the current zoom transform.
     const currentTransform = d3.zoomTransform(svgRef.current);
 
-    // Invert the pointer coordinates to obtain the "base" coordinates.
+    // Invert the pointer coordinates so we work in the base coordinate system.
     const [baseX, baseY] = currentTransform.invert([x, y]);
 
-    // Compute a new transform so that (baseX, baseY) is centered in the viewport.
-    const transform = d3.zoomIdentity
-      .translate(svgWidth / 2 - targetScale * baseX, svgHeight / 2 - targetScale * baseY)
-      .scale(targetScale);
+    // Compute the raw translation so that (baseX, baseY) would be centered.
+    let tx = svgWidth / 2 - targetScale * baseX;
+    let ty = svgHeight / 2 - targetScale * baseY;
 
+    // Retrieve the image (map) dimensions.
+    if (!imageDimensionsRef.current) {
+      // If not already stored, grab dimensions from the image node.
+      if (imageRef.current) {
+        const { width, height } = imageRef.current.getBoundingClientRect();
+        imageDimensionsRef.current = { width, height };
+      } else {
+        // Fallback: assume the SVG dimensions if the image isn't available.
+        imageDimensionsRef.current = { width: svgWidth, height: svgHeight };
+      }
+    }
+    const { width: contentWidth, height: contentHeight } = imageDimensionsRef.current;
+
+    // Calculate allowed translation limits.
+    // Assuming the image's top-left is at (0,0), the allowed tx is between:
+    //    tx_min = svgWidth - targetScale * contentWidth   and   tx_max = 0
+    // Similar for ty.
+    const txMin = svgWidth - targetScale * contentWidth;
+    const txMax = 0;
+    const tyMin = svgHeight - targetScale * contentHeight;
+    const tyMax = 0;
+
+    // Clamp the computed translation.
+    tx = Math.max(txMin, Math.min(tx, txMax));
+    ty = Math.max(tyMin, Math.min(ty, tyMax));
+
+    const transform = d3.zoomIdentity.translate(tx, ty).scale(targetScale);
     svg.transition().duration(duration).call(zoomBehavior.current.transform, transform);
   }
 
   /**
-   * Resets the zoom to the initial transform (i.e. “zoom out”)
+   * Resets the zoom to the initial transform (i.e. “zoom out”).
    */
   function resetZoom(duration: number = 300) {
     if (!svgRef.current || !zoomBehavior.current) return;
@@ -71,7 +101,6 @@ export function useSvgZoom(
     if (!svgRef.current || !imageRef.current || !zoomBehavior) return;
 
     const svg = d3.select(svgRef.current);
-    // Assumes your image group has id="image"
     const imageSelection = svg.selectChild<SVGGElement>("#image");
     const imageNode = imageSelection.node();
 
@@ -79,8 +108,9 @@ export function useSvgZoom(
       throw new Error("Cannot find #image node in the SVG structure.");
     }
 
-    // Get the dimensions of your image element.
+    // Get the dimensions of the image element.
     const { width, height } = imageNode.getBoundingClientRect();
+    imageDimensionsRef.current = { width, height };
 
     function zoomed(event: d3.D3ZoomEvent<SVGSVGElement, unknown>) {
       const { transform } = event;
@@ -89,7 +119,7 @@ export function useSvgZoom(
       }
     }
 
-    // Set up the zoom behavior.
+    // Set up zoom behavior.
     const zoom = d3.zoom<SVGSVGElement, unknown>().on("zoom", zoomed);
     zoomBehavior.current = zoom;
 
@@ -97,8 +127,7 @@ export function useSvgZoom(
       const svgNode = svg.node();
       if (!svgNode) return;
 
-      const { width: svgWidth, height: svgHeight } =
-        svgNode.getBoundingClientRect();
+      const { width: svgWidth, height: svgHeight } = svgNode.getBoundingClientRect();
       // Compute the minimum scale so that the image fits the viewport.
       const minScale = Math.max(svgWidth / width, svgHeight / height);
       minScaleRef.current = minScale;
@@ -119,7 +148,6 @@ export function useSvgZoom(
       zoom.scaleTo(svg, minScale);
     }
 
-    // Apply zoom behavior
     svg.call(zoom).on("dblclick.zoom", null);
     updateExtents();
 
@@ -132,7 +160,6 @@ export function useSvgZoom(
     };
     window.addEventListener("resize", handleResize, { passive: true });
 
-    // Clean up event listener on unmount
     return () => {
       window.removeEventListener("resize", handleResize);
     };
