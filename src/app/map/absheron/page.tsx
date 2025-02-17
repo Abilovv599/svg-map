@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 
 import { InteractiveMap } from "@/components/interactive-map/interactive-map";
-import Map from "@/assets/map-absheron.svg";
+import Map from "@/assets/maps/map-absheron.svg";
 
 export default function AbsheronMapPage() {
   return (
