@@ -1,9 +1,9 @@
 .map-controls {
   position: absolute;
-  top: 10px;
+  top: 20%;
   right: 10px;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 8px;
   z-index: 10;
 }
@@ -27,7 +27,7 @@
 }
 
 .zoom-icon {
-  width: 35px;
-  height: 35px;
+  width: 44px;
+  height: 44px;
   padding: 0.5rem;
 }
