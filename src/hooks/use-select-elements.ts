@@ -69,7 +69,11 @@ export function useSelectElements(
       .map((id) => document.getElementById(id) as SVGGraphicsElement | null)
       .filter((el): el is SVGGraphicsElement => el !== null);
 
-    if (selectedElements.length === 0) return;
+    if (selectedElements.length === 0) {
+      console.log("No valid selected elements found. Unlocking transition.");
+      isTransitioning.current = false;
+      return;
+    }
 
     // Get the overall SVG bounds for reference
     const svgBounds = calculateSVGBounds();
