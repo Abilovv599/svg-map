@@ -1,6 +1,13 @@
-import { RefObject, useEffect, useRef } from "react";
+import { RefObject, useEffect, useRef, useCallback, useMemo } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import * as d3 from "d3";
+
+interface Bounds {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
 
 export function useSelectElements(
   svgRef: RefObject<SVGSVGElement | null>,
@@ -12,145 +19,141 @@ export function useSelectElements(
 
   const selectedIds = useRef<Set<string>>(new Set());
   const isTransitioning = useRef(false);
+  const clickHandlersAttached = useRef(false);
+  const elementsCache = useRef<NodeListOf<Element> | null>(null);
+  const svgBoundsCache = useRef<Bounds | null>(null);
 
-  const calculateSVGBounds = () => {
-    if (!svgRef.current) return null;
+  // Memoize search params to prevent unnecessary re-renders
+  const currentIds = useMemo(() => {
+    return searchParams.get("ids")?.split(",").filter(Boolean) || [];
+  }, [searchParams]);
 
-    // First try to get all elements with shop IDs
-    const shopElements = svgRef.current.querySelectorAll('[id*="shop"]');
-    console.log("Found shop elements:", shopElements.length);
+  // Cache shop elements to avoid repeated DOM queries
+  const getShopElements = useCallback((): NodeListOf<Element> => {
+    if (!svgRef.current) return document.querySelectorAll('[id*="shop"]');
+
+    if (!elementsCache.current) {
+      elementsCache.current = svgRef.current.querySelectorAll('[id*="shop"]');
+    }
+    return elementsCache.current;
+  }, [svgRef]);
+
+  // Memoized bounds calculation
+  const calculateSVGBounds = useCallback((): Bounds | null => {
+    const shopElements = getShopElements();
 
     if (shopElements.length === 0) return null;
 
-    // Calculate the bounds encompassing all shop elements
-    const bounds = Array.from(shopElements).reduce(
-      (acc, element) => {
-        const bbox = (element as SVGGraphicsElement).getBBox();
-        console.log("Shop element bbox:", element.id, bbox);
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
 
-        if (!acc) {
-          return {
-            x: bbox.x,
-            y: bbox.y,
-            width: bbox.width,
-            height: bbox.height,
-          };
-        }
+    for (const element of shopElements) {
+      const bbox = (element as SVGGraphicsElement).getBBox();
+      minX = Math.min(minX, bbox.x);
+      minY = Math.min(minY, bbox.y);
+      maxX = Math.max(maxX, bbox.x + bbox.width);
+      maxY = Math.max(maxY, bbox.y + bbox.height);
+    }
 
-        const minX = Math.min(acc.x, bbox.x);
-        const minY = Math.min(acc.y, bbox.y);
-        const maxX = Math.max(acc.x + acc.width, bbox.x + bbox.width);
-        const maxY = Math.max(acc.y + acc.height, bbox.y + bbox.height);
+    return {
+      x: minX,
+      y: minY,
+      width: maxX - minX,
+      height: maxY - minY,
+    };
+  }, [getShopElements]);
 
-        return {
-          x: minX,
-          y: minY,
-          width: maxX - minX,
-          height: maxY - minY,
-        };
-      },
-      null as null | { x: number; y: number; width: number; height: number },
-    );
-
-    console.log("Calculated total bounds:", bounds);
-    return bounds;
-  };
-
-  const zoomToSelectedElements = () => {
-    if (!svgRef.current || !zoomBehavior.current) {
-      console.log("SVG or zoom behavior not available");
+  // Optimized zoom function
+  const zoomToSelectedElements = useCallback(() => {
+    if (
+      !svgRef.current ||
+      !zoomBehavior.current ||
+      selectedIds.current.size === 0
+    ) {
       return;
     }
 
     isTransitioning.current = true;
-    console.log("Starting transition, lock enabled"); // Debug log
 
-    const selectedElements = Array.from(selectedIds.current)
-      .map((id) => document.getElementById(id) as SVGGraphicsElement | null)
-      .filter((el): el is SVGGraphicsElement => el !== null);
+    const selectedElements: SVGGraphicsElement[] = [];
+    for (const id of selectedIds.current) {
+      const element = document.getElementById(id) as SVGGraphicsElement | null;
+      if (element) selectedElements.push(element);
+    }
 
     if (selectedElements.length === 0) {
-      console.log("No valid selected elements found. Unlocking transition.");
       isTransitioning.current = false;
       return;
     }
 
-    // Get the overall SVG bounds for reference
     const svgBounds = calculateSVGBounds();
     if (!svgBounds) {
-      console.log("Could not determine SVG bounds");
+      isTransitioning.current = false;
       return;
     }
 
-    // Calculate bounds of selected elements
-    const selectedBounds = selectedElements.reduce(
-      (acc, element) => {
-        const bbox = element.getBBox();
-        const ctm = element.getCTM();
-        if (!ctm) return acc;
+    // Optimized bounds calculation for selected elements
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
 
-        // Transform the bbox coordinates
-        const points = [
-          { x: bbox.x, y: bbox.y },
-          { x: bbox.x + bbox.width, y: bbox.y },
-          { x: bbox.x, y: bbox.y + bbox.height },
-          { x: bbox.x + bbox.width, y: bbox.y + bbox.height },
-        ].map((point) => {
-          const transformed = svgRef.current!.createSVGPoint();
-          transformed.x = point.x;
-          transformed.y = point.y;
-          return transformed.matrixTransform(ctm);
-        });
+    for (const element of selectedElements) {
+      const bbox = element.getBBox();
+      const ctm = element.getCTM();
+      if (!ctm) continue;
 
-        const minX = Math.min(...points.map((p) => p.x));
-        const minY = Math.min(...points.map((p) => p.y));
-        const maxX = Math.max(...points.map((p) => p.x));
-        const maxY = Math.max(...points.map((p) => p.y));
+      // Only calculate corner points we need
+      const corners: Array<[number, number]> = [
+        [bbox.x, bbox.y],
+        [bbox.x + bbox.width, bbox.y + bbox.height],
+      ];
 
-        if (!acc) {
-          return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
-        }
+      for (const [x, y] of corners) {
+        const transformed = svgRef.current.createSVGPoint();
+        transformed.x = x;
+        transformed.y = y;
+        const point = transformed.matrixTransform(ctm);
 
-        return {
-          x: Math.min(acc.x, minX),
-          y: Math.min(acc.y, minY),
-          width: Math.max(acc.x + acc.width, maxX) - Math.min(acc.x, minX),
-          height: Math.max(acc.y + acc.height, maxY) - Math.min(acc.y, minY),
-        };
-      },
-      null as null | { x: number; y: number; width: number; height: number },
-    );
+        minX = Math.min(minX, point.x);
+        minY = Math.min(minY, point.y);
+        maxX = Math.max(maxX, point.x);
+        maxY = Math.max(maxY, point.y);
+      }
+    }
 
-    if (!selectedBounds) return;
+    const selectedBounds: Bounds = {
+      x: minX,
+      y: minY,
+      width: maxX - minX,
+      height: maxY - minY,
+    };
 
     const svgWidth = svgRef.current.clientWidth;
     const svgHeight = svgRef.current.clientHeight;
 
-    // Add padding (5% of the smaller dimension)
     const padding = Math.min(svgWidth, svgHeight) * 0.05;
-    const paddedBounds = {
+    const paddedBounds: Bounds = {
       x: selectedBounds.x - padding,
       y: selectedBounds.y - padding + 30,
       width: selectedBounds.width + padding * 2,
       height: selectedBounds.height + padding * 2,
     };
 
-    // Calculate scale to fit the selection
     const scaleX = svgWidth / paddedBounds.width;
     const scaleY = svgHeight / paddedBounds.height;
     const scale = Math.min(Math.min(scaleX, scaleY), 4);
 
-    // Calculate the center point of the bounds
     const centerX = paddedBounds.x + paddedBounds.width / 2;
     const centerY = paddedBounds.y + paddedBounds.height / 2;
 
-    // Create transform
     const transform = d3.zoomIdentity
       .translate(svgWidth / 2, svgHeight / 2)
       .scale(scale)
       .translate(-centerX, -centerY);
 
-    // Apply transform with a single smooth transition
     d3.select(svgRef.current)
       .transition()
       .duration(750)
@@ -158,75 +161,44 @@ export function useSelectElements(
       .call(zoomBehavior.current.transform, transform)
       .on("end", () => {
         isTransitioning.current = false;
-        console.log("Transition ended, lock disabled"); // Debug log
       })
       .on("interrupt", () => {
-        // Add interrupt handler
         isTransitioning.current = false;
-        console.log("Transition interrupted, lock disabled"); // Debug log
       });
-  };
+  }, [svgRef, zoomBehavior, calculateSVGBounds]);
 
-  useEffect(() => {
-    // Initialize selected IDs from URL
-    const initialSelected = searchParams.get("ids")?.split(",") || [];
-    selectedIds.current = new Set(initialSelected.filter(Boolean));
-
-    if (
-      selectedIds.current.size > 0 &&
-      svgRef.current &&
-      zoomBehavior.current
-    ) {
-      zoomToSelectedElements();
-    }
-  }, [searchParams]);
-
-  useEffect(() => {
-    // Selection and click handler setup
-    const clickableElementsSelect = d3.selectAll<SVGElement, unknown>(
-      "[id*='shop']",
-    );
-
-    console.log("Initial selection count:", selectedIds.current.size);
-
-    clickableElementsSelect.each(function () {
-      const element = d3.select(this);
-      const id = this.id;
-      element.classed("selected", selectedIds.current.has(id));
-    });
-
-    // Click handler for selectable elements
-    clickableElementsSelect.on("click", function (event) {
+  // Memoized click handler
+  const handleElementClick = useCallback(
+    (event: Event) => {
       if (isTransitioning.current) {
         event.stopPropagation();
         return;
       }
 
       event.stopPropagation();
-      const element = d3.select(this);
-      const id = this.id;
+      const target = event.currentTarget as SVGElement;
+      const element = d3.select(target);
+      const id = target.id;
       const isSelected = element.classed("selected");
 
-      console.log("Element clicked:", { id, isSelected });
-
       if (!svgRef?.current || !zoomBehavior?.current) {
-        console.log("SVG or zoom behavior not available");
         return;
       }
 
-      // Clear all existing selections
-      clickableElementsSelect.classed("selected", false);
+      // Clear all selections efficiently
+      const shopElements = getShopElements();
+      for (const el of shopElements) {
+        d3.select(el).classed("selected", false);
+      }
       selectedIds.current.clear();
 
-      // Select new element if it wasn't already selected
+      // Set new selection if element wasn't previously selected
       if (!isSelected) {
         element.classed("selected", true);
         selectedIds.current.add(id);
       }
 
-      console.log("Updated selection count:", selectedIds.current.size);
-
-      // Update URL params first (without triggering a re-render)
+      // Update URL with batched operation
       const params = new URLSearchParams(searchParams.toString());
       const selectedString = Array.from(selectedIds.current).join(",");
 
@@ -238,8 +210,68 @@ export function useSelectElements(
       }
 
       router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-    });
-  }, [pathname, router, searchParams, svgRef, zoomBehavior]);
+    },
+    [
+      svgRef,
+      zoomBehavior,
+      getShopElements,
+      searchParams,
+      pathname,
+      router,
+      zoomToSelectedElements,
+    ],
+  );
+
+  // Initialize selections from URL (only runs when currentIds changes)
+  useEffect(() => {
+    selectedIds.current = new Set(currentIds);
+
+    if (
+      selectedIds.current.size > 0 &&
+      svgRef.current &&
+      zoomBehavior.current
+    ) {
+      // Update visual selection state
+      const shopElements = getShopElements();
+      for (const element of shopElements) {
+        const isSelected = selectedIds.current.has(element.id);
+        d3.select(element).classed("selected", isSelected);
+      }
+
+      zoomToSelectedElements();
+    }
+  }, [
+    currentIds,
+    svgRef,
+    zoomBehavior,
+    getShopElements,
+    zoomToSelectedElements,
+  ]);
+
+  // Attach click handlers only once
+  useEffect(() => {
+    if (!svgRef.current || clickHandlersAttached.current) return;
+
+    const shopElements = getShopElements();
+
+    for (const element of shopElements) {
+      element.addEventListener("click", handleElementClick);
+    }
+
+    clickHandlersAttached.current = true;
+
+    // Cleanup function
+    return () => {
+      if (clickHandlersAttached.current) {
+        for (const element of shopElements) {
+          element.removeEventListener("click", handleElementClick);
+        }
+        clickHandlersAttached.current = false;
+        elementsCache.current = null;
+        svgBoundsCache.current = null; // Clear bounds cache on cleanup
+      }
+    };
+  }, [svgRef, handleElementClick, getShopElements]);
 
   return { selectedIds, zoomToSelectedElements };
 }
